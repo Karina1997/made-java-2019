@@ -7,7 +7,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 
 public class FileTradeSource implements TradeSource {
-
     private final Path path;
 
     public FileTradeSource(Path path) {

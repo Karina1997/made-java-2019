@@ -1,16 +1,13 @@
 package com.made.academy.m1.trade;
 
-import java.math.BigDecimal;
-
 public abstract class Trade {
+    private final double price;
 
-    private final BigDecimal price;
-
-    public Trade(BigDecimal price) {
+    public Trade(double price) {
         this.price = price;
     }
 
-    public BigDecimal getPrice() {
+    public double getPrice() {
         return price;
     }
 

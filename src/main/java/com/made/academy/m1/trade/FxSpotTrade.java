@@ -1,9 +1,7 @@
 package com.made.academy.m1.trade;
 
-import java.math.BigDecimal;
-
 public class FxSpotTrade extends Trade {
-    public FxSpotTrade(BigDecimal price) {
+    public FxSpotTrade(double price) {
         super(price);
     }
 }

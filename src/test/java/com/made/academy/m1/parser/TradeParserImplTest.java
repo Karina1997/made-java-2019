@@ -1,6 +1,7 @@
 package com.made.academy.m1.parser;
 
 import com.made.academy.m1.exception.TradeParseException;
+import com.made.academy.m1.resolver.EnumFactoryTradeResolver;
 import com.made.academy.m1.source.SimpleTradeSource;
 import com.made.academy.m1.source.TradeSource;
 import com.made.academy.m1.trade.BondTrade;
@@ -8,46 +9,44 @@ import com.made.academy.m1.trade.FxSpotTrade;
 import com.made.academy.m1.trade.Trade;
 import org.junit.Test;
 
-import java.math.BigDecimal;
-
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 public class TradeParserImplTest {
-
     @Test
     public void testParseOnTradeTypeExist() {
         TradeSource source = simpleTradeSourceFor("FX_SPOT", "101.5");
-        Trade trade = new TradeParserImpl(source).parse();
+        Trade trade = new TradeParserImpl(source, new EnumFactoryTradeResolver()).parse();
 
         assertTrue(trade instanceof FxSpotTrade);
-        assertEquals(BigDecimal.valueOf(101.5), trade.getPrice());
+        assertEquals(101.5, trade.getPrice(), 10e-5);
     }
 
     @Test(expected = TradeParseException.class)
     public void testParseOnTradeTypeEmpty() {
         TradeSource source = simpleTradeSourceFor("", "101.5");
-        new TradeParserImpl(source).parse();
+        new TradeParserImpl(source, new EnumFactoryTradeResolver()).parse();
     }
 
     @Test(expected = TradeParseException.class)
     public void testParseOnTradePriceEmpty() {
         TradeSource source = simpleTradeSourceFor("FX_SPOT", "");
-        new TradeParserImpl(source).parse();
+        new TradeParserImpl(source, new EnumFactoryTradeResolver()).parse();
     }
 
     @Test
     public void testParseOnTradePriceDecimalDot() {
         TradeSource source = simpleTradeSourceFor("BOND", "10.512");
-        Trade trade = new TradeParserImpl(source).parse();
+        Trade trade = new TradeParserImpl(source, new EnumFactoryTradeResolver()).parse();
 
         assertTrue(trade instanceof BondTrade);
-        assertEquals(BigDecimal.valueOf(10.512), trade.getPrice());
+        assertEquals(10.512, trade.getPrice(), 10e-5);
     }
 
     @Test(expected = TradeParseException.class)
     public void testParseOnTradePriceDecimalComma() {
         TradeSource source = simpleTradeSourceFor("BOND", "10,512");
-        Trade trade = new TradeParserImpl(source).parse();
+        Trade trade = new TradeParserImpl(source, new EnumFactoryTradeResolver()).parse();
     }
 
     private static TradeSource simpleTradeSourceFor(String type, String price) {
