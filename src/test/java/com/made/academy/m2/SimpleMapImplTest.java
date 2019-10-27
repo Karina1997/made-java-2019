@@ -3,12 +3,12 @@ package com.made.academy.m2;
 import org.junit.Test;
 
 import java.util.Collection;
+import java.util.NoSuchElementException;
 import java.util.Set;
 
 import static org.junit.Assert.*;
 
 public class SimpleMapImplTest {
-
     @Test
     public void testPutOnKeyExist() {
         SimpleMap<String, String> m = new SimpleMapImpl<>();
@@ -52,7 +52,7 @@ public class SimpleMapImplTest {
         assertEquals(0, m.size());
     }
 
-    @Test
+    @Test(expected = NoSuchElementException.class)
     public void testRemoveOnKeyNotExist() {
         SimpleMap<String, String> m = new SimpleMapImpl<>();
         assertNull(m.remove("k1"));

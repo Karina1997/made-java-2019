@@ -1,8 +1,6 @@
 package com.made.academy.m2;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 class SimpleMapImpl<K, V> implements SimpleMap<K, V> {
@@ -11,22 +9,24 @@ class SimpleMapImpl<K, V> implements SimpleMap<K, V> {
 
     private Entry<K, V>[] table;
 
-    public static class Entry<K, V> {
-        private final K key;
-        private final V value;
+    private static class Entry<K, V> {
+        private K key;
+        private V value;
         private Entry<K, V> next;
+        private Entry<K, V> previous;
 
-        public Entry(K key, V value, Entry<K, V> next) {
+        Entry(K key, V value, Entry<K, V> next, Entry<K, V> previous) {
             this.key = key;
             this.value = value;
             this.next = next;
+            this.previous = previous;
         }
 
-        public K getKey() {
+        K getKey() {
             return key;
         }
 
-        public V getValue() {
+        V getValue() {
             return value;
         }
     }
@@ -41,86 +41,45 @@ class SimpleMapImpl<K, V> implements SimpleMap<K, V> {
 
     @Override
     public V put(K key, V value) {
-        if (key == null)
-            return null;
-
         int hash = hash(key);
-        Entry<K, V> newEntry = new Entry<>(key, value, null);
+        Entry<K, V> oldEntry = findEntry(key, hash);
+        Entry<K, V> newEntry = new Entry<>(key, value, null, oldEntry);
 
-        if (table[hash] == null) {
+        V oldValue;
+        if (oldEntry == null) {
             table[hash] = newEntry;
+            oldValue = null;
         } else {
-            Entry<K, V> previous = null;
-            Entry<K, V> current = table[hash];
-
-            while (current != null) {
-                if (current.key.equals(key)) {
-                    V oldValue;
-                    if (previous == null) {
-                        oldValue = current.value;
-                        newEntry.next = current.next;
-                        table[hash] = newEntry;
-                    } else {
-                        oldValue = previous.next.value;
-                        newEntry.next = current.next;
-                        previous.next = newEntry;
-                    }
-
-                    return oldValue;
-                }
-                previous = current;
-                current = current.next;
-            }
-
-            previous.next = newEntry;
+            oldValue = oldEntry.value;
+            oldEntry.value = value;
         }
 
-        return null;
+        return oldValue;
     }
 
     @Override
     public V get(K key) {
         int hash = hash(key);
-        if (table[hash] == null) {
-            return null;
-        } else {
-            Entry<K, V> temp = table[hash];
-            while (temp != null) {
-                if (temp.key.equals(key))
-                    return temp.value;
-                temp = temp.next;
-            }
-            return null;
-        }
+        Entry<K, V> entry = findEntry(key, hash);
+        return entry != null ? entry.value : null;
     }
 
     @Override
-    public V remove(K deleteKey) {
-        int hash = hash(deleteKey);
+    public V remove(K key) {
+        int hash = hash(key);
+        Entry<K, V> entry = findEntry(key, hash);
 
-        if (table[hash] == null) {
-            return null;
+        if (entry == null) throw new NoSuchElementException();
+
+        Entry<K, V> previous = entry.previous;
+        Entry<K, V> next = entry.next;
+        if (previous == null) {
+            table[hash] = null;
         } else {
-            Entry<K, V> previous = null;
-            Entry<K, V> current = table[hash];
-
-            while (current != null) {
-                if (current.key.equals(deleteKey)) {
-                    V oldValue;
-                    if (previous == null) {
-                        oldValue = table[hash].value;
-                        table[hash] = table[hash].next;
-                    } else {
-                        oldValue = previous.next.value;
-                        previous.next = current.next;
-                    }
-                    return oldValue;
-                }
-                previous = current;
-                current = current.next;
-            }
-            return null;
+            previous.next = next;
         }
+
+        return entry.value;
     }
 
     @Override
@@ -147,7 +106,7 @@ class SimpleMapImpl<K, V> implements SimpleMap<K, V> {
                 .collect(Collectors.toList());
     }
 
-    public Collection<Entry<K, V>> entries() {
+    private Collection<Entry<K, V>> entries() {
         Collection<Entry<K, V>> entries = new ArrayList<>();
         for (Entry<K, V> e : table) {
             if (e != null) {
@@ -161,7 +120,21 @@ class SimpleMapImpl<K, V> implements SimpleMap<K, V> {
         return entries;
     }
 
+    private Entry<K, V> findEntry(K key, int hash) {
+        Entry<K, V> current = table[hash];
+        while (current != null) {
+            if (current.key.equals(key)) {
+                return current;
+            }
+            current = current.next;
+        }
+
+        return null;
+    }
+
     private int hash(K key) {
+        if (key == null) throw new IllegalArgumentException();
+
         return Math.abs(key.hashCode()) % table.length;
     }
 }
