@@ -54,7 +54,7 @@ public class ObjectReaderImpl implements ObjectReader {
     }
 
     private boolean isValue(Object e) {
-        return e.getClass().isPrimitive() || e instanceof String;
+        return e == null || e.getClass().isPrimitive() || e instanceof String;
     }
 
     private boolean isCollection(Object e) {

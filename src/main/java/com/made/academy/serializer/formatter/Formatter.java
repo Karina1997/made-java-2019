@@ -51,6 +51,12 @@ public abstract class Formatter {
         throw new RuntimeException("Undefined node type");
     }
 
+    void appendWrapped(String s, String startsWith, String endsWith, StringBuilder sb) {
+        sb.append(startsWith)
+                .append(s)
+                .append(endsWith);
+    }
+
     private void traverseObject(ObjectNode objectNode, StringBuilder sb) {
         onObjectEnter(objectNode, sb);
         Collection<Map.Entry<String, Node>> entries = objectNode.getChildren().entrySet();
@@ -59,8 +65,11 @@ public abstract class Formatter {
             String key = e.getKey();
             Node value = e.getValue();
             onObjectKeyEnter(key, sb, i, entries.size());
-            if (value instanceof ValueNode) onObjectValueEnter(value.asString(), sb, i, entries.size());
-            else traverseItemNode(value, sb);
+            if (value instanceof ValueNode) {
+                onObjectValueEnter(value.asString(), sb, i, entries.size());
+            } else {
+                traverseItemNode(value, sb);
+            }
             onObjectKeyLeave(e.getKey(), sb, i, objectNode.getChildren().entrySet().size());
             i++;
         }
@@ -72,16 +81,23 @@ public abstract class Formatter {
         Collection<Node> values = arrayNode.getItems();
         int i = 0;
         for (Node value : values) {
-            if (value instanceof ValueNode) onArrayItemEnter(value.asString(), sb, i, values.size());
-            else traverseItemNode(value, sb);
+            if (value instanceof ValueNode) {
+                onArrayItemEnter(value.asString(), sb, i, values.size());
+            } else {
+                traverseItemNode(value, sb);
+            }
             i++;
         }
         onArrayLeave(sb);
     }
 
     private void traverseItemNode(Node node, StringBuilder sb) {
-        if (node instanceof ArrayNode) traverseArray((ArrayNode) node, sb);
-        else if (node instanceof ObjectNode) traverseObject((ObjectNode) node, sb);
-        else onTreeNodeTypeUndefined();
+        if (node instanceof ArrayNode) {
+            traverseArray((ArrayNode) node, sb);
+        } else if (node instanceof ObjectNode) {
+            traverseObject((ObjectNode) node, sb);
+        } else {
+            onTreeNodeTypeUndefined();
+        }
     }
 }

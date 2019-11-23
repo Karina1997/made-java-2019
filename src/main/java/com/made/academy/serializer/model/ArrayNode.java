@@ -1,11 +1,11 @@
 package com.made.academy.serializer.model;
 
+import java.util.ArrayList;
 import java.util.Collection;
-import java.util.LinkedList;
 import java.util.List;
 
 public class ArrayNode extends Node {
-    private final List<Node> items = new LinkedList<>();
+    private final List<Node> items = new ArrayList<>();
 
     public ArrayNode add(Node value) {
         items.add(value);

@@ -16,10 +16,8 @@ public class JsonFormatter extends Formatter {
     @Override
     public void onObjectKeyEnter(String key, StringBuilder sb, int index, int size) {
         if (index > 0) sb.append(",");
-        sb.append("\"")
-                .append(key)
-                .append("\"")
-                .append(":");
+        appendQuoted(key, sb);
+        sb.append(":");
     }
 
     @Override
@@ -28,17 +26,13 @@ public class JsonFormatter extends Formatter {
 
     @Override
     public void onObjectValueEnter(String value, StringBuilder sb, int index, int size) {
-        sb.append("\"")
-                .append(value)
-                .append("\"");
+        appendQuoted(value, sb);
     }
 
     @Override
     public void onArrayItemEnter(String value, StringBuilder sb, int index, int size) {
         if (index > 0) sb.append(",");
-        sb.append("\"")
-                .append(value)
-                .append("\"");
+        appendQuoted(value, sb);
     }
 
     @Override
@@ -49,5 +43,9 @@ public class JsonFormatter extends Formatter {
     @Override
     public void onArrayLeave(StringBuilder sb) {
         sb.append("]");
+    }
+
+    private void appendQuoted(String s, StringBuilder sb) {
+        appendWrapped(s, "\"", "\"", sb);
     }
 }

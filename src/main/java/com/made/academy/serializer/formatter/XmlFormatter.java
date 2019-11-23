@@ -5,22 +5,22 @@ import com.made.academy.serializer.model.ObjectNode;
 public class XmlFormatter extends Formatter {
     @Override
     void onRootObjectEnter(ObjectNode objectNode, StringBuilder sb) {
-        sb.append("<").append(objectNode.getName()).append(">");
+        appendOpenTag(objectNode.getName(), sb);
     }
 
     @Override
     void onRootObjectLeave(ObjectNode objectNode, StringBuilder sb) {
-        sb.append("</").append(objectNode.getName()).append(">");
+        appendCloseTag(objectNode.getName(), sb);
     }
 
     @Override
     public void onObjectKeyEnter(String key, StringBuilder sb, int index, int size) {
-        sb.append("<").append(key).append(">");
+        appendOpenTag(key, sb);
     }
 
     @Override
     public void onObjectKeyLeave(String key, StringBuilder sb, int index, int size) {
-        sb.append("</").append(key).append(">");
+        appendOpenTag(key, sb);
     }
 
     @Override
@@ -30,8 +30,17 @@ public class XmlFormatter extends Formatter {
 
     @Override
     public void onArrayItemEnter(String value, StringBuilder sb, int index, int size) {
-        sb.append("<").append(index + 1).append(">")
-                .append(value)
-                .append("</").append(index + 1).append(">");
+        String tag = String.valueOf(index + 1);
+        appendOpenTag(tag, sb);
+        sb.append(value);
+        appendCloseTag(tag, sb);
+    }
+
+    private void appendCloseTag(String name, StringBuilder sb) {
+        appendWrapped(name, "</", ">", sb);
+    }
+
+    private void appendOpenTag(String name, StringBuilder sb) {
+        appendWrapped(name, "<", ">", sb);
     }
 }
